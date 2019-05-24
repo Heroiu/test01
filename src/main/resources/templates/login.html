@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base id="base" href="${base}">
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link href="../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}" rel="stylesheet">
+    <script src="layui/layui.js" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" src="jquery/jquery.min.js" th:src="@{/jquery/jquery.min.js}"></script>
+    <style>
+        *{
+            /*border: 1px solid red;*/
+        }
+        .div1{
+            padding: 10px;
+            width: 400px;
+            margin: auto;
+            margin-top: 100px;
+            box-shadow:0px 0px 10px 10px whitesmoke;
+        }
+    </style>
+</head>
+<body>
+    <div class="div1">
+        <form class="layui-form" action="" >
+            <div class="layui-form-item" >
+                <h1 style="text-align: center">什么什么管理系统</h1>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">账号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="username" required  lay-verify="required" placeholder="请输入账号" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux tis1"></div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux tis2"></div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" id="sub" lay-submit lay-filter="formDemo">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+
+        <script>
+            layui.use('form', function(){
+                var form = layui.form;
+
+                //监听提交
+                form.on('submit(formDemo)', function(data){
+                    layer.msg(JSON.stringify(data.field));
+                });
+            });
+        </script>
+    </div>
+    <script>
+        layui.use('layer',function(){
+
+            var layer = layui.layer;
+
+            //登录的点击事件
+            $("#sub").on("click",function(){
+                login();
+                return false;
+            })
+
+            //登录函数
+            function login(){
+                var username = $("input[ name='username' ] ").val();
+                var password = $("input[ name='password' ] ").val();
+                $.ajax({
+                    url:"/users/login",
+                    data:{"username":username,"password":password},
+                    type:"post",
+                    dataType:"json",
+                    success:function(data){
+                        if(data.code==1){
+                            $(".tis2").addClass("layui-hide");
+                            $(".tis1").addClass("layui-hide");
+                            window.location = "/users/list";
+                        }else{
+                            $(".tis1").text("")
+                            $(".tis2").text("")
+                            if(data.code==-1){
+                                $(".tis1").text(data.message)
+                            }else if(data.code==-2){
+                                $(".tis2").text(data.message)
+                            }else if(data.code==-3){
+                                $(".tis1").text(data.message)
+                            }
+                        }
+                    }
+                })
+            }
+        })
+    </script>
+</body>
+</html>

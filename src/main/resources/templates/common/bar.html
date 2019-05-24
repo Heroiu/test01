@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head  xmlns:th="http://www.thymeleaf.org">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}" rel="stylesheet">
+    <script src="layui/layui.js" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" src="jquery/jquery.min.js" th:src="@{/jquery/jquery.min.js}"></script>
+</head>
+<body>
+<ul class="layui-nav layui-nav-tree" lay-filter="test" id="sidebar">
+    <li th:if="${session0.myCapacity.contains(session0.capacityManager)}" class="layui-nav-item layui-nav-itemed">
+        <a href="javascript:;">权限管理</a>
+        <dl class="layui-nav-child">
+            <dd th:if="${session0.myCapacity.contains(session0.usersManager)}"><a href="/users/list">用户管理</a></dd>
+            <dd th:if="${session0.myCapacity.contains(session0.roleManager)}"><a href="/role/list">角色管理</a></dd>
+            <dd th:if="${session0.myCapacity.contains(session0.funcManager)}"><a href="/capacity/list">功能管理</a></dd>
+        </dl>
+    </li>
+    <li th:if="${session0.myCapacity.contains(session0.logManager)}" class="layui-nav-item">
+        <a href="javascript:;">日志管理</a>
+        <dl class="layui-nav-child">
+            <dd th:if="${session0.myCapacity.contains(session0.logInfo)}"><a href="/log/list">日志信息</a></dd>
+        </dl></li>
+    <li class="layui-nav-item"><a href="">选项三</a></li>
+    <li class="layui-nav-item"><a href="">选项四</a></li>
+</ul>
+<div id="iconKuang" class="layui-form" style="display: none;">
+    <div class="layui-form-item">
+        <br>
+        <h2 style="text-align: center">图片预览</h2>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block"><br>
+            <img id="usersIcon" src="/users/showIcon" width="100" height="100">
+            <br><br>
+        </div>
+        <div class="layui-input-block"><br>
+            <button class="layui-btn" name="iconcontent" id="uploadIcon">选择文件</button><br>
+        </div>
+    </div>
+    <script>
+
+    </script>
+</div>
+<div class="layui-header" id="headerBar">
+
+    <div class="layui-logo">什么什么管理系统</div>
+    <ul class="layui-nav layui-layout-left">
+        <li class="layui-nav-item"><a href="">管理1</a></li>
+        <li class="layui-nav-item"><a href="">管理2</a></li>
+        <li class="layui-nav-item"><a href="">管理3</a></li>
+        <li class="layui-nav-item">
+            <a href="javascript:;">其它系统</a>
+            <dl class="layui-nav-child">
+                <dd><a href="">邮件管理</a></dd>
+                <dd><a href="">消息管理</a></dd>
+                <dd><a href="">授权管理</a></dd>
+            </dl>
+        </li>
+    </ul>
+    <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item">
+
+            <a href="javascript:;">
+                <img src="/users/showIcon" class="layui-nav-img">
+                <span th:text="${session1.myusers.name}">小明</span>
+            </a>
+            <dl class="layui-nav-child">
+                <dd><a href="" onclick="openIcon();return false;">更换头像</a>
+                <script>
+                    layui.use(['upload'],function () {
+                        var upload = layui.upload //上传
+
+                        var uploadicon = upload.render({
+                            elem: '#uploadIcon'
+                            ,url: '/users/updateIcon'
+                            ,method: 'post'
+                            ,accept:'file'
+                            ,done: function(res){
+                                layer.open({title: '提示',content: res.message});
+                            },error: function(res) {
+                                layer.open({title: '提示',content: '出现错误'});
+                            }
+                        });
+                    })
+                    function openIcon(){
+                        layui.use(['layer'],function () {
+                            var layer = layui.layer,$=layui.$;
+                            layer.open({
+                                type:1,
+                                area:['350px','300px'],
+                                title:'',
+                                shadeClose:false,
+                                content: $('#iconKuang')
+                            });
+                        })
+                        return false;
+                    }
+                </script>
+                </dd>
+                <dd><a href="">安全设置</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item"><a href="/users/exit">退出</a></li>
+    </ul>
+</div>
+<script>
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+    layui.use("layer",function(){
+        }
+    );
+</script>
+</body>
+</html>

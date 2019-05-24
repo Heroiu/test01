@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>权限管理</title>
+    <link href="../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}" rel="stylesheet">
+    <script src="layui/layui.js" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" src="../static/jquery/jquery.min.js" th:src="@{/jquery/jquery.min.js}"></script>
+</head>
+<body>
+<div  th:replace="common/bar::#iconKuang"></div>
+<div  class="layui-layout layui-layout-admin">
+    <div class="layui-header" th:replace="common/bar::#headerBar(session1=${session})">
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree" lay-filter="test" th:replace="common/bar::#sidebar(session0=${session})"></ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <div  class="layui-fluid ">
+            <div class="layui-row">
+                <div class="layui-col-md12">
+            <span class="layui-breadcrumb">
+              <a href="">权限管理</a>
+              <a><cite>角色管理</cite></a>
+            </span>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <br><h2>角色管理</h2><br>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <button th:if="${session.myCapacity.contains(session.insertRole)}" class="layui-btn layui-btn-radius"  onclick="openModak()">添加新角色</button>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <table class="layui-table" id="roleList" lay-filter="roleList"></table>
+                    <script type="text/html" id="roleBar">
+                        <a class="layui-btn layui-btn-xs" lay-event="update">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        © layui.com - 底部固定区域
+    </div>
+</div>
+
+
+<form id="motaikunag" class="layui-form" style="display: none;">
+    <div class="layui-form-item">
+        <br>
+        <h2 style="text-align: center">添加新角色</h2>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" required  lay-verify="required"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色说明</label>
+        <div class="layui-input-inline">
+            <input type="text" name="detail"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色权限</label>
+        <div class="layui-input-block">
+            <table th:each="capacity1:${capacityTier1List}"  style="padding: 1px;margin: 1px;height: 32px" >
+                <tr  style="padding: 1px;margin: 1px;height: 32px" >
+                    <td style="padding: 1px;margin: 1px;height: 32px"><input type="checkbox"  name="capacityArray" th:value="${capacity1.id}" title="查看信息" th:title="${capacity1.name}">:</td>
+                </tr>
+                <tr  style="padding: 1px;margin: 1px;height: 32px"  th:if="${capacity1.childCapacityList!=null&&capacity1.childCapacityList.size()>0}" th:each="capacity2:${capacity1.childCapacityList}">
+                    <td style="padding: 1px;margin: 1px;height: 32px" >
+                        <input type="checkbox"  name="capacityArray" th:value="${capacity2.id}" title="查看信息" th:title="${capacity2.name}">:
+                    </td>
+                    <td style="padding: 1px;margin: 1px;height: 32px" th:if="${capacity2.childCapacityList!=null&&capacity2.childCapacityList.size()>0}" th:each="capacity3:${capacity2.childCapacityList}">
+                        <input type="checkbox"  name="capacityArray" th:value="${capacity3.id}" title="查看信息" th:title="${capacity3.name}">
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" id="sub" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+    <script>
+        layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider','form'], function() {
+            var laydate = layui.laydate //日期
+                , laypage = layui.laypage //分页
+                , layer = layui.layer //弹层
+                , table = layui.table //表格
+                , carousel = layui.carousel //轮播
+                , upload = layui.upload //上传
+                , element = layui.element //元素操作
+                , slider = layui.slider //滑块
+                , form = layui.form;
+
+            table.render({
+                elem: '#roleList'
+                ,url: '/role/listajax/'
+                ,title: '角色表'
+                ,page: true
+                ,toolbar: 'default'
+                ,height: 'full-250'
+                ,limit:13
+                ,cols: [
+                    [
+                        {title:'序号',width:80,align:'center',type:'numbers'}
+                        ,{field: 'name',width:'20%',align:'center', title: '名称'}
+                        ,{field: 'detail', title: '说明',  align:'center'}
+                        ,{fixed: 'right', width:200, align:'center', toolbar: '#roleBar'}
+                    ]
+                ]
+            });
+
+            table.on('tool(roleList)', function(obj){
+                var data = obj.data;
+                if(obj.event === 'update'){
+                    layer.msg('未能修改');
+
+                } else if(obj.event === 'delete'){
+                    layer.confirm('真的删除行么', function(index){
+                        $.ajax({
+                            url:"/role/delete",
+                            data:{"id":data.id},
+                            type:"post",
+                            dataType:"json",
+                            async:false,
+                            success:function(data){
+                                if(data==1){
+                                    layer.open({title: '提示',content: '删除成功'});
+                                }else{
+                                    layer.open({title: '提示',content: '删除失败'});
+                                }
+                            }
+                        });
+                        obj.del();
+                        layer.close(index);
+                    });
+                }
+            });
+
+            form.on('submit(formDemo)', function(data){
+                layer.msg(JSON.stringify(data.field));
+                return false;
+            });
+
+        })
+
+
+        function openModak(){
+            layui.use(['layer'],function () {
+                var layer = layui.layer,$=layui.$;
+                layer.open({
+                    type:1,
+                    area:['800px','800px'],
+                    title:'',
+                    shadeClose:false,
+                    content: $('#motaikunag')
+                });
+            })
+        }
+        $("#sub").on("click",function(){
+            formsub();
+            return false;
+        })
+        function formsub(){
+            var name = $("input[ name='name' ] ").val();
+            var detail= $("input[ name='detail' ] ").val();
+            var capacityArray=new Array();
+            var i=0;
+            $("input[name=capacityArray]:checked").each(function(){
+                capacityArray[i]=$(this).val();
+                i++;
+            });
+            $.ajax({
+                url:"/role/add",
+                data:{"name":name,"detail":detail,"capacityArray":capacityArray},
+                type:"post",
+                dataType:"json",
+                async:false,
+                success:function(data){
+                    if(data.code==1){
+                        //layer.open({title: '提示',content: '添加成功'});
+                        window.location.reload();
+                    }else{
+                        layer.open({title: '提示',content: data.message});
+                    }
+                }
+            })
+        }
+    </script>
+</body>
+</html>

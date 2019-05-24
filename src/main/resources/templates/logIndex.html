@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>日志管理</title>
+    <link href="../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}" rel="stylesheet">
+    <script src="layui/layui.js" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" src="jquery/jquery.min.js" th:src="@{/jquery/jquery.min.js}"></script>
+</head>
+<body>
+<div  th:replace="common/bar::#iconKuang"></div>
+<div  class="layui-layout layui-layout-admin">
+    <div class="layui-header" th:replace="common/bar::#headerBar(session1=${session})">
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree" lay-filter="test" th:replace="common/bar::#sidebar(session0=${session})"></ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <div  class="layui-fluid ">
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <span class="layui-breadcrumb">
+                      <a href="">日志管理</a>
+                      <a><cite>日志信息</cite></a>
+                    </span>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <br><h2>日志信息</h2><br>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="demoTable">
+
+                        操作类型:
+                        <div class="layui-inline">
+                            <select id="capacityId" name="capacityId" lay-verify="">
+                                <option value="0">全部</option>
+                                <option value="1">添加角色</option>
+                                <option value="2">添加用户</option>
+                                <option value="23">添加权限</option>
+                            </select>
+                        </div>
+                        搜索关键词：
+                        <div class="layui-inline">
+                            <input class="layui-input" name="id" id="content" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" id="subReload" data-type="reload">搜索</button>
+                    </div>
+                    <table class="layui-table" tablelayout="auto" id="logList"></table>
+                    <script type="text/html" id="logBar">
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        © layui.com - 底部固定区域
+    </div>
+</div>
+
+
+<script>
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider'], function(){
+        var laydate = layui.laydate //日期
+            ,laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            ,table = layui.table //表格
+            ,carousel = layui.carousel //轮播
+            ,upload = layui.upload //上传
+            ,element = layui.element //元素操作
+            ,slider = layui.slider //滑块
+
+        table.render({
+            elem: '#logList'
+            ,id:'logReload'
+            ,url: '/log/listajax/'
+            ,title: '日志表'
+            ,page: true
+            ,toolbar: 'default'
+            ,height: 'full-250'
+            ,limit:13
+            ,cols: [
+                [
+                    {title:'序号',width:80,align:'center',type:'numbers'}
+                    ,{field: 'capacityId',width:'20%',align:'center', title: '操作'}
+                    ,{field: 'content', title: '说明',  align:'center'}
+                    ,{field: 'usersId', title: '操作者',align:'center',width:'20%'}
+                    ,{field: 'createTime', title: '操作时间',align:'center',width:'20%'}
+                    ,{fixed: 'right', width:200, align:'center', toolbar: '#logBar'}
+                ]
+            ]
+        });
+
+        var $ = layui.$, active = {
+            reload: function(){
+                var capacityId = $('#capacityId');
+                var content=$('#content');
+                //执行重载
+                table.reload('logReload', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        capacityId: capacityId.val()
+                        ,content:content.val()
+                    }
+                });
+            }
+        };
+
+        $('#subReload').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+
+</script>
+</body>
+</html>

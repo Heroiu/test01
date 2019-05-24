@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>权限管理</title>
+    <link href="../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}" rel="stylesheet">
+    <script src="../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" src="../static/jquery/jquery.min.js" th:src="@{/jquery/jquery.min.js}"></script>
+</head>
+<body>
+<div  th:replace="common/bar::#iconKuang"></div>
+<div  class="layui-layout layui-layout-admin">
+    <div class="layui-header" th:replace="common/bar::#headerBar(session1=${session})">
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree" lay-filter="test" th:replace="common/bar::#sidebar(session0=${session})"></ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <div  class="layui-fluid ">
+            <div class="layui-row">
+                <div class="layui-col-md12">
+            <span class="layui-breadcrumb">
+              <a href="">权限管理</a>
+              <a><cite>功能管理</cite></a>
+            </span>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <br><h2>功能管理</h2><br>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <button th:if="${session.myCapacity.contains(session.insertCapacity)}" class="layui-btn layui-btn-radius" onclick="openModak()">添加一级功能</button>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <table class="layui-hide" id="capacityList" lay-filter="capacityList"></table>
+                    <script type="text/html" id="capacityBar">
+                        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="add">添加子功能</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="update">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer">
+        © layui.com - 底部固定区域
+    </div>
+</div>
+
+<div id="motaikunag" class="layui-form" style="display: none;">
+    <div class="layui-form-item">
+        <br>
+        <h2 style="text-align: center">添加一级功能</h2>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">功能名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" required  lay-verify="required"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">功能说明</label>
+        <div class="layui-input-inline">
+            <input type="text" name="detail"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" id="sub" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</div>
+<div id="motaikunag2" class="layui-form" style="display: none;">
+    <div class="layui-form-item">
+        <br>
+        <h2 style="text-align: center" id="parentCapacityName">添加子功能</h2>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">功能名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name2" required  lay-verify="required"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">功能说明</label>
+        <div class="layui-input-inline">
+            <input type="text" name="detail2"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" id="sub2" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</div>
+    <script id="parentCapacityShow">
+        {{# if(d.parentCapacityId!=null&&d.parentCapacityId!=0){}}
+        <span>{{d.parentCapacity.name}}</span>
+            {{# }else{}}
+            无
+            {{# }}}
+    </script>
+    <script>
+        layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider'], function() {
+            var laydate = layui.laydate //日期
+                , laypage = layui.laypage //分页
+                , layer = layui.layer //弹层
+                , table = layui.table //表格
+                , carousel = layui.carousel //轮播
+                , upload = layui.upload //上传
+                , element = layui.element //元素操作
+                , slider = layui.slider //滑块
+
+            table.render({
+                elem: '#capacityList'
+                ,url: '/capacity/listajax/'
+                ,title: '功能表'
+                ,page: true
+                ,toolbar: 'default'
+                ,height: 'full-250'
+                ,limit:13
+                ,filter:'capacityList'
+                ,cols: [
+                    [
+                        {title:'序号',width:80,align:'center',type:'numbers'}
+                        ,{field: 'name',width:'15%', title: '名称',align:'center'}
+                        ,{field: 'detail', title: '说明',align:'center'}
+                        ,{field: 'state', title: '状态',width:'10%',  sort: true,align:'center'}
+                        ,{field: 'parentCapacityId', title: '父功能',width:'15%',align:'center',templet:'#parentCapacityShow'}
+                        ,{field: 'tier', title: '等级',width:'15%',  sort: true,align:'center'}
+                        ,{fixed: 'right', width:200, align:'center', toolbar: '#capacityBar'}
+                    ]
+                ]
+            });
+
+            table.on('tool(capacityList)', function(obj){
+                var data = obj.data;
+                if(obj.event === 'update'){
+                    layer.msg('未能修改');
+
+                } else if(obj.event === 'delete'){
+                    layer.confirm('真的删除行么', function(index){
+                        $.ajax({
+                            url:"/capacity/delete",
+                            data:{"id":data.id},
+                            type:"post",
+                            dataType:"json",
+                            async:false,
+                            success:function(data){
+                                if(data==1){
+                                    layer.open({title: '提示',content: '删除成功'});
+                                }else{
+                                    layer.open({title: '提示',content: '删除失败'});
+                                }
+                            }
+                        });
+                        obj.del();
+                        layer.close(index);
+                    });
+                }else if(obj.event === 'add'){
+                    parentCapacityId=data.id;
+                    tier=data.tier;
+                    var name=data.name;
+                    $("#parentCapacityName").text("为["+name+"]添加子功能");
+                    layui.use(['layer'],function () {
+                        var layer = layui.layer,$=layui.$;
+                        layer.open({
+                            type:1,
+                            area:['400px','300px'],
+                            title:'',
+                            shadeClose:false,
+                            content: $('#motaikunag2')
+                        });
+                    })
+                }
+            });
+
+        });
+
+
+
+
+        function openModak(){
+            layui.use(['layer'],function () {
+                var layer = layui.layer,$=layui.$;
+                layer.open({
+                    type:1,
+                    area:['400px','300px'],
+                    title:'',
+                    shadeClose:false,
+                    content: $('#motaikunag')
+                });
+            })
+        }
+        $("#sub").on("click",function(){
+            var name = $("input[ name='name' ] ").val();
+            var detail = $("input[ name='detail' ] ").val();
+            $.ajax({
+                url:"/capacity/add",
+                data:{"name":name,"detail":detail,"tier":1},
+                type:"post",
+                dataType:"json",
+                async:false,
+                success:function(data){
+                    if(data==1){
+                        window.location.reload();
+                    }else{
+                        layer.open({title: '提示',content: '添加失败'});
+                    }
+                }
+            })
+            return false;
+        })
+        //*************************
+        var parentCapacityId=0;
+        var tier=0;
+
+        $("#sub2").on("click",function(){
+            var name = $("input[ name='name2' ] ").val();
+            var detail = $("input[ name='detail2' ] ").val();
+            $.ajax({
+                url:"/capacity/add",
+                data:{"name":name,"detail":detail,"tier":++tier,"parentCapacityId":parentCapacityId},
+                type:"post",
+                dataType:"json",
+                async:false,
+                success:function(data){
+                    if(data==1){
+                        //layer.open({title: '提示',content: '添加成功'});
+                        window.location.reload();
+                    }else{
+                        layer.open({title: '提示',content: '添加失败'});
+                    }
+                }
+            })
+            return false;
+        })
+    </script>
+</body>
+</html>
